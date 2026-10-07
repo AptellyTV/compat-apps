@@ -92,6 +92,10 @@ class ReleasePolicyTests(unittest.TestCase):
         self.payload["assets"][0]["url"] = "https://example.com/latest.apk"; self.resign()
         with self.assertRaisesRegex(ValueError, "versioned"): validate_release(self.root)
 
+    def test_account_fields_cannot_enter_public_manifest(self):
+        self.payload["license_headers"] = {"Cookie": "fake-private-user"}; self.resign()
+        with self.assertRaisesRegex(ValueError, "Unreviewed fields"): validate_release(self.root)
+
     def test_catalog_prevents_package_collision_and_version_downgrade(self):
         release = {"version_code": 2, "version_name": "1.0.0", "tag": self.tag, "manifest_url": f"https://github.com/{REPOSITORY}/releases/download/{self.tag}/{self.tag}.json", "manifest_sha256": "a" * 64, "channel": "stable"}
         app = {"app_id": "test-app", "package_name": "app.aptelly.test", "signer_certificate_sha256": self.fingerprint, "releases": [release]}

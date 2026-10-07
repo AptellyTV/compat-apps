@@ -86,6 +86,9 @@ def validate_release(directory, expected=None):
     signature = base64.b64decode(envelope["signature"], validate=True)
     require(0 < len(payload) <= 32768, "Invalid payload size")
     value = json.loads(payload)
+    allowed = {"schema_version", "app_id", "name", "package_name", "version_code", "version_name", "channel", "tag", "min_api", "abis", "source_revision", "qualified_profile_ids", "signer_certificate_sha256", "assets", "mirrors"}
+    require(set(value).issubset(allowed), "Unreviewed fields in public release manifest")
+    require(value.get("mirrors", []) == [], "Additional mirrors require a reviewed policy revision")
     require(value["schema_version"] == 1, "Unknown release schema")
     require(APP_ID.fullmatch(value["app_id"]) and PACKAGE.fullmatch(value["package_name"]), "Invalid identity")
     require(value["package_name"].startswith("app.aptelly.") and ".diagnostics." not in value["package_name"], "Only our production compatibility packages may be published")
@@ -94,7 +97,7 @@ def validate_release(directory, expected=None):
     tag = value["app_id"] + "-v" + value["version_name"]
     require(value["tag"] == tag and manifests[0].name == tag + ".json", "Manifest/tag mismatch")
     require(HEX.fullmatch(value["signer_certificate_sha256"]), "Invalid signer")
-    require(type(value["min_api"]) is int and value["min_api"] >= 26 and value["abis"], "Missing platform constraints")
+    require(type(value["min_api"]) is int and value["min_api"] >= 26 and isinstance(value["abis"], list) and value["abis"] and all(a in ("armeabi-v7a", "arm64-v8a", "x86", "x86_64") for a in value["abis"]), "Missing platform constraints")
     require(re.fullmatch(r"[a-f0-9]{40}", value["source_revision"]), "Missing exact source revision")
     require(value["qualified_profile_ids"] and all(re.fullmatch(r"[a-z0-9-]{1,100}", p) for p in value["qualified_profile_ids"]), "Missing qualified profiles")
     if expected:

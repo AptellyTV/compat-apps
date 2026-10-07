@@ -6,7 +6,7 @@ This is the shared download hub for independently maintained Android TV compatib
 
 Install an application offered for your television by Aptelly, then open its TV launcher entry. Sign into your own service account when the application requires one. Integrated compatibility fixes are included in the download; users do not need developer tools or separate patch ZIP files.
 
-Each release includes one signed APK, its checksum, a signed version manifest, the public signing certificate, the corresponding source package and third-party notices. Versioned downloads remain available for verification and rollback. Stable and beta releases are tracked separately for each application in `catalog.json`; the repository-wide “latest release” is not an application update feed.
+Each release includes one signed APK, its checksum, a signed version manifest, the public signing certificate, the corresponding source package and third-party notices. Published assets are immutable. Versioned downloads remain available for verification and recovery. Stable and beta releases are tracked separately for each application in `catalog.json`; the repository-wide “latest release” is not an application update feed. A recovery update uses a higher Android version code so account data can be retained.
 
 Application compatibility depends on the tested hardware and software profile. Aptelly presents releases supported by the matching profile.
 
